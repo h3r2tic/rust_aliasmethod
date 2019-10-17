@@ -20,34 +20,29 @@
 // ```
 extern crate rand;
 
+use self::rand::{prelude::ThreadRng, thread_rng, Rng};
 use std::fmt;
-use self::rand::{thread_rng, ThreadRng, Rng};
-
 
 pub struct AliasMethod<RNG: Rng> {
     rng: RNG,
 }
-
 
 /// Creates a new AliasMethod using the ThreadRng
 pub fn alias_method() -> AliasMethod<ThreadRng> {
     AliasMethod::new(thread_rng())
 }
 
-
 #[derive(Debug)]
 pub struct AliasTable {
-    len: i32,
-    prob: Vec<f64>,
-    alias: Vec<usize>,
+    pub len: i32,
+    pub prob: Vec<f64>,
+    pub alias: Vec<usize>,
 }
 
 #[derive(Debug)]
 pub enum AliasMethodError {
     ZeroTotalWeights,
-    Internal {
-        text: String,
-    },
+    Internal { text: String },
 }
 
 impl fmt::Display for AliasMethodError {
@@ -78,7 +73,6 @@ impl<RNG: Rng> AliasMethod<RNG> {
     }
 }
 
-
 /// Creates a new AliasTable struct.
 pub fn new_alias_table(weights: &[f64]) -> Result<AliasTable, AliasMethodError> {
     let n = weights.len() as i32;
@@ -88,7 +82,10 @@ pub fn new_alias_table(weights: &[f64]) -> Result<AliasTable, AliasMethodError> 
         return Err(AliasMethodError::ZeroTotalWeights);
     }
 
-    let mut prob = weights.iter().map(|w| w * f64::from(n) / sum).collect::<Vec<f64>>();
+    let mut prob = weights
+        .iter()
+        .map(|w| w * f64::from(n) / sum)
+        .collect::<Vec<f64>>();
     let mut h = 0;
     let mut l = n - 1;
     let mut hl: Vec<usize> = vec![0; n as usize];
@@ -111,14 +108,18 @@ pub fn new_alias_table(weights: &[f64]) -> Result<AliasTable, AliasMethodError> 
         let k = hl[(h - 1) as usize];
 
         if 1.0 < prob[j] {
-            return Err(AliasMethodError::Internal { text: format!("MUST: {} <= 1", prob[j]) });
+            return Err(AliasMethodError::Internal {
+                text: format!("MUST: {} <= 1", prob[j]),
+            });
         }
         if prob[k] < 1.0 {
-            return Err(AliasMethodError::Internal { text: format!("MUST: 1 <= {}", prob[k]) });
+            return Err(AliasMethodError::Internal {
+                text: format!("MUST: 1 <= {}", prob[k]),
+            });
         }
 
         a[j] = k;
-        prob[k] -= 1.0 - prob[j];   // - residual weight
+        prob[k] -= 1.0 - prob[j]; // - residual weight
         l += 1;
         if prob[k] < 1.0 {
             hl[l as usize] = k;
@@ -133,7 +134,6 @@ pub fn new_alias_table(weights: &[f64]) -> Result<AliasTable, AliasMethodError> 
         alias: a,
     })
 }
-
 
 #[test]
 fn test_new_alias_table() {

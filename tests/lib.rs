@@ -3,23 +3,51 @@ extern crate rand;
 
 #[cfg(test)]
 mod tests {
-    use aliasmethod::{new_alias_table, alias_method};
+    use aliasmethod::{alias_method, new_alias_table};
     use std::collections::HashMap;
 
-    struct TestParam {weights: Vec<f64>, rates: Vec<f64>}
+    struct TestParam {
+        weights: Vec<f64>,
+        rates: Vec<f64>,
+    }
 
     #[test]
     fn test_probability() {
         let params: [TestParam; 6] = [
-            TestParam {weights: vec![10.0, 15.0],       rates:vec![40.0, 60.0]},
-            TestParam {weights: vec![20.0, 30.0],       rates:vec![40.0, 60.0]},
-            TestParam {weights: vec![20.0, 5.0],        rates:vec![80.0, 20.0]},
-            TestParam {weights: vec![25.0],             rates:vec![100.0]},
-            TestParam {weights: vec![1.0, 99.0],        rates:vec![1.0, 99.0]},
-            TestParam {weights: vec![1.0, 1.0, 8.0],    rates:vec![10.0, 10.0, 80.0]},
+            TestParam {
+                weights: vec![10.0, 15.0],
+                rates: vec![40.0, 60.0],
+            },
+            TestParam {
+                weights: vec![20.0, 30.0],
+                rates: vec![40.0, 60.0],
+            },
+            TestParam {
+                weights: vec![20.0, 5.0],
+                rates: vec![80.0, 20.0],
+            },
+            TestParam {
+                weights: vec![25.0],
+                rates: vec![100.0],
+            },
+            TestParam {
+                weights: vec![1.0, 99.0],
+                rates: vec![1.0, 99.0],
+            },
+            TestParam {
+                weights: vec![1.0, 1.0, 8.0],
+                rates: vec![10.0, 10.0, 80.0],
+            },
         ];
 
-        for (param_no, &TestParam{ref weights, ref rates}) in params.into_iter().enumerate() {
+        for (
+            param_no,
+            &TestParam {
+                ref weights,
+                ref rates,
+            },
+        ) in params.into_iter().enumerate()
+        {
             match new_alias_table(&weights) {
                 Err(e) => {
                     assert!(false, "error : {}", e);
